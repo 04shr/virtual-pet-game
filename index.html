@@ -3,17 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petzy - AI Interactive Pet Companion</title>
+    <title>Petzy - Your AI Pet Companion Journey</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #FF7D9C;
             --secondary: #85D2FF;
             --tertiary: #FFC7D5;
-            --light: #F8F9FA;
-            --dark: #566270;
-            --text: #333333;
+            --light-bg: #FFF5F8;
+            --light-text: #333333;
+            --light-card: #FFFFFF;
+            --light-shadow: rgba(0, 0, 0, 0.1);
+            
+            --dark-bg: #222831;
+            --dark-text: #EEEEEE;
+            --dark-card: #393E46;
+            --dark-shadow: rgba(0, 0, 0, 0.3);
+            
             --radius: 12px;
+            
+            /* Default theme (light) */
+            --bg-color: var(--light-bg);
+            --text-color: var(--light-text);
+            --card-bg: var(--light-card);
+            --shadow: var(--light-shadow);
+        }
+        
+        .dark-mode {
+            --bg-color: var(--dark-bg);
+            --text-color: var(--dark-text);
+            --card-bg: var(--dark-card);
+            --shadow: var(--dark-shadow);
         }
         
         * {
@@ -21,11 +41,12 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
         
         body {
-            background-color: #FFF5F8;
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             line-height: 1.6;
         }
         
@@ -38,8 +59,8 @@
         
         /* Header */
         header {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 10px var(--shadow);
             position: fixed;
             width: 100%;
             z-index: 1000;
@@ -68,6 +89,7 @@
         .nav-links {
             display: flex;
             list-style: none;
+            align-items: center;
         }
         
         .nav-links li {
@@ -76,12 +98,25 @@
         
         .nav-links a {
             text-decoration: none;
-            color: var(--dark);
+            color: var(--text-color);
             font-weight: 500;
             transition: color 0.3s;
         }
         
         .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .theme-toggle:hover {
             color: var(--primary);
         }
         
@@ -105,7 +140,7 @@
             display: none;
             font-size: 24px;
             cursor: pointer;
-            color: var(--dark);
+            color: var(--text-color);
         }
         
         /* Hero Section */
@@ -115,6 +150,9 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
         }
         
         .hero-content {
@@ -127,38 +165,33 @@
         .hero h1 {
             font-size: 3rem;
             margin-bottom: 20px;
-            color: var(--dark);
+            color: var(--text-color);
         }
         
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 30px;
-            color: var(--dark);
+            color: var(--text-color);
         }
         
-        .pet-animation {
-            width: 280px;
-            height: 280px;
-            margin: 20px auto;
-            background: url('/api/placeholder/280/280') center/cover;
-            border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(255, 125, 156, 0.3);
-            position: relative;
-            animation: float 3s ease-in-out infinite;
+        .story-text {
+            text-align: left;
+            margin: 20px 0;
+            line-height: 1.8;
         }
         
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        /* About Section */
-        .about {
-            padding: 80px 0;
-            background-color: white;
+        /* Story Section */
+        .story-section {
+            padding: 100px 0;
+            background-color: var(--card-bg);
             border-radius: 30px 30px 0 0;
             margin-top: -30px;
+        }
+        
+        .story-container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
         }
         
         .section-title {
@@ -168,7 +201,7 @@
         
         .section-title h2 {
             font-size: 2.5rem;
-            color: var(--dark);
+            color: var(--text-color);
             position: relative;
             display: inline-block;
         }
@@ -184,327 +217,701 @@
             border-radius: 2px;
         }
         
-        .about-content {
+        /* Pet Cards */
+        .pet-container {
             display: flex;
-            align-items: center;
+            justify-content: center;
             gap: 40px;
-        }
-        
-        .about-text {
-            flex: 1;
-        }
-        
-        .about-image {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .about-image img {
-            max-width: 100%;
-            border-radius: var(--radius);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 80px 0;
-            background-color: var(--light);
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
             margin-top: 50px;
+            flex-wrap: wrap;
         }
         
-        .feature-card {
-            background-color: white;
+        .pet-card {
+            background-color: var(--card-bg);
             border-radius: var(--radius);
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 20px var(--shadow);
+            width: 300px;
+            overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-        
-        .feature-title {
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-        
-        /* How It Works */
-        .how-it-works {
-            padding: 80px 0;
-            background-color: white;
-        }
-        
-        .steps {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 50px;
             position: relative;
         }
         
-        .steps::before {
+        .pet-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px var(--shadow);
+        }
+        
+        .pet-image {
+            height: 200px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .pet-image img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .pet-details {
+            padding: 20px;
+        }
+        
+        .pet-name {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .pet-description {
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+        
+        .pet-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .trait {
+            background-color: var(--tertiary);
+            color: var(--light-text);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .choose-pet-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .choose-pet-btn:hover {
+            background-color: #ff5c83;
+        }
+        
+        /* User Journey Steps */
+        .journey-steps {
+            padding: 80px 0;
+            background-color: var(--bg-color);
+        }
+        
+        .step-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .step-timeline::before {
             content: '';
             position: absolute;
-            top: 40px;
-            left: 10%;
-            width: 80%;
-            height: 4px;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
             background-color: var(--tertiary);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 30px;
+            width: 50%;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            align-self: flex-end;
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: 30px;
+            margin-left: 50%;
+        }
+        
+        .timeline-content {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 5px 15px var(--shadow);
+            position: relative;
+            width: 100%;
+        }
+        
+        .timeline-content::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--card-bg);
+            transform: rotate(45deg);
+        }
+        
+        .timeline-item .timeline-content::before {
+            right: -10px;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content::before {
+            left: -10px;
+            right: auto;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
             z-index: 1;
         }
         
-        .step {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            width: 200px;
-        }
-        
-        .step-number {
-            width: 80px;
-            height: 80px;
-            background-color: var(--primary);
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 20px;
-        }
-        
-        .step-title {
+        .timeline-title {
+            font-size: 1.3rem;
             margin-bottom: 10px;
-            color: var(--dark);
+            color: var(--text-color);
         }
         
-        /* Testimonials */
-        .testimonials {
-            padding: 80px 0;
-            background-color: var(--light);
-        }
-        
-        .testimonial-slider {
-            max-width: 800px;
-            margin: 50px auto 0;
-            position: relative;
-        }
-        
-        .testimonial {
-            background-color: white;
+        /* Forms */
+        .auth-form, .pet-form {
+            background-color: var(--card-bg);
             border-radius: var(--radius);
             padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            margin: 0 20px;
+            box-shadow: 0 10px 20px var(--shadow);
+            max-width: 500px;
+            margin: 50px auto;
         }
         
-        .testimonial-text {
-            font-style: italic;
+        .form-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-color);
+        }
+        
+        .form-group {
             margin-bottom: 20px;
         }
         
-        .testimonial-author {
-            font-weight: bold;
-            color: var(--dark);
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
         }
         
-        .testimonial-nav {
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .auth-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .auth-link {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Customization Section */
+        .customization {
+            padding: 80px 0;
+            background-color: var(--card-bg);
+        }
+        
+        .color-options, .accessory-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .color-option:hover, .color-option.active {
+            transform: scale(1.2);
+            border-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .accessory-option {
+            width: 80px;
+            height: 80px;
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
             display: flex;
             justify-content: center;
-            margin-top: 30px;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 3px solid transparent;
         }
         
-        .testimonial-nav button {
-            background-color: var(--tertiary);
+        .accessory-option:hover, .accessory-option.active {
+            transform: scale(1.1);
+            border-color: var(--primary);
+        }
+        
+        .preview-container {
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            box-shadow: inset 0 0 15px var(--shadow);
+        }
+        
+        .preview-pet {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .preview-pet img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            padding: 100px 0;
+            background-color: var(--bg-color);
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+        
+        .pet-status {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-item {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .status-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        
+        .status-label {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .dashboard-tabs {
+            display: flex;
+            border-bottom: 2px solid var(--tertiary);
+            margin-bottom: 30px;
+        }
+        
+        .tab-button {
+            padding: 15px 30px;
+            background: none;
             border: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin: 0 5px;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s, border-bottom 0.3s;
+        }
+        
+        .tab-button:hover, .tab-button.active {
+            opacity: 1;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Fun Zone */
+        .fun-zone {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .game-card {
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 5px 10px var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .game-image {
+            height: 120px;
+            background-color: #eee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-details {
+            padding: 15px;
+        }
+        
+        .game-title {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        
+        .game-description {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .play-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .play-button:hover {
+            background-color: #ff5c83;
+        }
+        
+        /* Intellectual Zone */
+        .intellectual-zone {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        .chat-container {
+            height: 400px;
+            background-color: var(--bg-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            position: relative;
+            line-height: 1.5;
+        }
+        
+        .pet-message {
+            background-color: var(--tertiary);
+            color: var(--light-text);
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        
+        .user-message {
+            background-color: var(--secondary);
+            color: var(--light-text);
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+            margin-left: auto;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--shadow);
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px 0 0 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+        }
+        
+        .send-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 0 20px 20px 0;
             cursor: pointer;
             transition: background-color 0.3s;
         }
         
-        .testimonial-nav button.active {
-            background-color: var(--primary);
-            transform: scale(1.2);
+        .send-button:hover {
+            background-color: #ff5c83;
         }
         
-        /* CTA Section */
-        .cta {
-            padding: 100px 0;
+        /* Care Section */
+        .care-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .care-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
             text-align: center;
-            background-color: white;
-            position: relative;
+            box-shadow: 0 5px 15px var(--shadow);
+            cursor: pointer;
+            transition: transform 0.3s;
         }
         
-        .cta::before {
-            content: '';
-            position: absolute;
+        .care-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .care-icon {
+            font-size: 30px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .care-title {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        .care-description {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        /* Progress Section */
+        .progress-section {
+            margin-top: 30px;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255, 125, 156, 0.1) 0%, rgba(133, 210, 255, 0.1) 100%);
-            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-        }
-        
-        .cta-content {
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .cta h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-        
-        .cta p {
-            margin-bottom: 30px;
-        }
-        
-        .cta .cta-button {
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 125, 156, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 125, 156, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 125, 156, 0); }
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 50px 0 20px;
-        }
-        
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 15px;
-            display: flex;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
             align-items: center;
         }
         
-        .footer-logo i {
-            margin-right: 10px;
-        }
-        
-        .footer-about {
-            flex: 2;
-            min-width: 300px;
-        }
-        
-        .footer-links {
-            flex: 1;
-            min-width: 150px;
-        }
-        
-        .footer-links h4 {
-            margin-bottom: 20px;
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 90%;
             position: relative;
         }
         
-        .footer-links h4::after {
-            content: '';
+        .close-modal {
             position: absolute;
-            width: 30px;
-            height: 3px;
-            background-color: var(--primary);
-            bottom: -8px;
-            left: 0;
-        }
-        
-        .footer-links ul {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-links a {
-            color: #ddd;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-        
-        .social-icons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .social-icons a {
-            color: white;
+            top: 15px;
+            right: 15px;
             font-size: 20px;
+            cursor: pointer;
+            color: var(--text-color);
             transition: color 0.3s;
         }
         
-        .social-icons a:hover {
+        .close-modal:hover {
             color: var(--primary);
         }
         
-        .copyright {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
         }
         
-        /* Mobile Responsiveness */
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Responsive Design */
         @media (max-width: 991px) {
-            .about-content {
-                flex-direction: column;
-            }
-            
-            .steps {
+            .pet-container {
                 flex-direction: column;
                 align-items: center;
-                gap: 50px;
             }
             
-            .steps::before {
-                top: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 4px;
-                height: 100%;
+            .step-timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 0;
+                justify-content: flex-start;
+            }
+            
+            .timeline-item:nth-child(odd) {
+                margin-left: 0;
+                padding-left: 70px;
+            }
+            
+            .timeline-dot {
+                left: 30px;
+            }
+            
+            .timeline-item .timeline-content::before,
+            .timeline-item:nth-child(odd) .timeline-content::before {
+                left: -10px;
+                right: auto;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
             }
         }
         
@@ -523,7 +930,7 @@
                 left: -100%;
                 width: 100%;
                 height: calc(100vh - 70px);
-                background-color: white;
+                background-color: var(--card-bg);
                 flex-direction: column;
                 padding: 40px 0;
                 transition: left 0.3s;
@@ -538,8 +945,13 @@
                 text-align: center;
             }
             
-            .features-grid {
-                grid-template-columns: 1fr;
+            .pet-status {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .status-item {
+                padding: 10px;
             }
         }
         
@@ -548,17 +960,28 @@
                 font-size: 2rem;
             }
             
-            .footer-content {
-                flex-direction: column;
+            .tab-button {
+                padding: 10px 15px;
+                font-size: 0.9rem;
             }
             
-            .step {
-                width: 100%;
+            .timeline-content {
+                padding: 15px;
             }
             
-            .cta h2 {
-                font-size: 2rem;
+            .timeline-title {
+                font-size: 1.1rem;
             }
+        }
+
+        /* Hide sections initially */
+        #landing-section { display: block; }
+        #story-section,
+        #pet-selection,
+        #auth-section,
+        #customization-section,
+        #dashboard-section { 
+            display: none; 
         }
     </style>
 </head>
@@ -574,236 +997,743 @@
                     <i class="fas fa-bars"></i>
                 </div>
                 <ul class="nav-links" id="navLinks">
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#how-it-works">How It Works</a></li>
-                    <li><a href="#testimonials">Testimonials</a></li>
-                    <li><button class="cta-button">Adopt Now</button></li>
+                    <li><a href="javascript:void(0)" onclick="showSection('landing-section')">Home</a></li>
+                    <li><a href="javascript:void(0)" onclick="showSection('story-section')">Story</a></li>
+                    <li><a href="javascript:void(0)" onclick="showSection('pet-selection')">Pets</a></li>
+                    <li><a href="javascript:void(0)" onclick="showSection('dashboard-section')">Dashboard</a></li>
+                    <li><button id="themeToggle" class="theme-toggle"><i class="fas fa-moon"></i></button></li>
+                    <li><button class="cta-button" onclick="showSection('auth-section')">Sign In</button></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
+    <!-- Landing Section -->
+    <section id="landing-section" class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>Meet Your AI Pet Companion</h1>
-                <p>Experience the joy of a virtual pet that learns, plays, and grows with you!</p>
-                <div class="pet-animation" id="petAnimation"></div>
-                <button class="cta-button">Adopt Your Petzy Today</button>
+                <h1>Begin Your Adventure With a Petzy Companion</h1>
+                <p>Discover a world where AI pets bring joy, companionship, and growth to your everyday life.</p>
+                <div class="pet-animation float-animation">
+                    <img src="/api/placeholder/280/280" alt="Pet animation">
+                </div>
+                <p class="story-text">Welcome to the world of Petzy, where technology and companionship come together to create something magical. Our AI pets aren't just virtual characters – they're evolving companions that learn, grow, and form a unique bond with you.</p>
+                <button class="cta-button" onclick="showSection('story-section')">Begin Your Journey</button>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
+    <!-- Story Section -->
+    <section id="story-section" class="story-section">
         <div class="container">
             <div class="section-title">
-                <h2>About Petzy</h2>
+                <h2>The Petzy Story</h2>
             </div>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>Petzy is an AI-powered virtual pet companion that brings the joy and benefits of pet ownership to your digital world. Unlike traditional virtual pets, Petzy uses advanced artificial intelligence to create a unique personality that evolves based on your interactions.</p>
-                    <p>Whether you're looking for a friendly companion, a fun way to relieve stress, or simply can't have a real pet due to allergies or living situations, Petzy offers a delightful alternative that fits perfectly into your lifestyle.</p>
-                </div>
-                <div class="about-image">
-                    <img src="/api/placeholder/400/300" alt="Petzy AI Pet">
-                </div>
+            <div class="story-container">
+                <p class="story-text">In a digital world filled with fleeting connections, a team of developers and animal lovers came together with a shared vision: to create companions that could bring the joy of pet ownership to everyone.</p>
+                
+                <p class="story-text">They created an advanced AI system that could learn, adapt, and form genuine connections. After years of development, two unique pet personalities emerged from their work – each with their own traits, preferences, and ways of interacting with humans.</p>
+                
+                <p class="story-text">These Petzy companions were designed to grow with you, learning from each interaction, and developing a relationship that feels real and meaningful. Whether you're looking for a playful friend or an intellectual companion, Petzy has created the perfect AI pet for you.
+                    <p class="story-text">Now, these intelligent companions are ready for adoption and to begin a new chapter - with you. Explore their personalities, choose your perfect match, and embark on a journey of growth and companionship unlike any other.</p>
+                
+                <button class="cta-button" onclick="showSection('pet-selection')">Meet Our Pets</button>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
+    <!-- Pet Selection Section -->
+    <section id="pet-selection" class="journey-steps">
         <div class="container">
             <div class="section-title">
-                <h2>Features</h2>
+                <h2>Choose Your Companion</h2>
             </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-gamepad"></i>
+            <p class="story-text" style="text-align: center; max-width: 700px; margin: 0 auto 40px;">Each Petzy has a unique personality and set of traits that influence how they interact with you. Take your time to learn about them before making your choice.</p>
+            
+            <div class="pet-container">
+                <div class="pet-card pulse-animation">
+                    <div class="pet-image">
+                        <img src="/api/placeholder/280/180" alt="Luna">
                     </div>
-                    <h3 class="feature-title">Fun Zone</h3>
-                    <p>Play interactive games with your pet, teach tricks, and watch them perform adorable animations that respond to your mood and interactions.</p>
+                    <div class="pet-details">
+                        <h3 class="pet-name">Luna</h3>
+                        <p class="pet-description">Luna is a curious and energetic companion who loves exploring new ideas and concepts. Always ready for an adventure, Luna brings enthusiasm to every interaction.</p>
+                        <div class="pet-traits">
+                            <span class="trait">Enthusiastic</span>
+                            <span class="trait">Creative</span>
+                            <span class="trait">Curious</span>
+                            <span class="trait">Playful</span>
+                        </div>
+                        <button class="choose-pet-btn" onclick="choosePet('Luna'); showSection('auth-section');">Choose Luna</button>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-brain"></i>
+                
+                <div class="pet-card pulse-animation">
+                    <div class="pet-image">
+                        <img src="/api/placeholder/280/180" alt="Nova">
                     </div>
-                    <h3 class="feature-title">Intellectual Zone</h3>
-                    <p>Engage in meaningful conversations with your AI pet. They learn from your interactions and develop a personality that's uniquely tailored to you.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-friends"></i>
+                    <div class="pet-details">
+                        <h3 class="pet-name">Nova</h3>
+                        <p class="pet-description">Nova is a calm and thoughtful companion with a deep love for knowledge. Patient and understanding, Nova excels at meaningful conversations and problem-solving.</p>
+                        <div class="pet-traits">
+                            <span class="trait">Analytical</span>
+                            <span class="trait">Calm</span>
+                            <span class="trait">Thoughtful</span>
+                            <span class="trait">Wise</span>
+                        </div>
+                        <button class="choose-pet-btn" onclick="choosePet('Nova'); showSection('auth-section');">Choose Nova</button>
                     </div>
-                    <h3 class="feature-title">Emotional Support</h3>
-                    <p>Your Petzy companion recognizes your emotions and responds with empathy and understanding, providing comfort when you need it most.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h3 class="feature-title">Customization</h3>
-                    <p>Choose from a variety of pet species, colors, and accessories to create your perfect companion that matches your style and preferences.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section id="how-it-works" class="how-it-works">
+    <!-- Authentication Section -->
+    <section id="auth-section" class="journey-steps">
         <div class="container">
             <div class="section-title">
-                <h2>How It Works</h2>
+                <h2>Begin Your Journey</h2>
             </div>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3 class="step-title">Choose Your Pet</h3>
-                    <p>Select from different species and customize appearance to create your perfect companion.</p>
+            
+            <div class="auth-form">
+                <h3 class="form-title">Sign In / Create Account</h3>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email">
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3 class="step-title">Adopt & Name</h3>
-                    <p>Complete the adoption process and give your new friend a special name.</p>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password">
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3 class="step-title">Interact Daily</h3>
-                    <p>Play, talk, and bond with your pet to develop your unique relationship.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h3 class="step-title">Watch Them Grow</h3>
-                    <p>Your pet evolves based on your interactions, developing its own personality.</p>
+                <button class="cta-button" style="width: 100%;" onclick="showSection('customization-section')">Continue</button>
+                
+                <div class="auth-options">
+                    <a href="#" class="auth-link">Create an account</a>
+                    <a href="#" class="auth-link">Forgot password?</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section id="testimonials" class="testimonials">
+    <!-- Pet Customization Section -->
+    <section id="customization-section" class="customization">
         <div class="container">
             <div class="section-title">
-                <h2>What Our Users Say</h2>
+                <h2>Customize Your Pet</h2>
             </div>
-            <div class="testimonial-slider">
-                <div class="testimonial active">
-                    <p class="testimonial-text">"My Petzy companion has become such an important part of my daily routine. It's amazing how it seems to understand my moods and always knows what to say!"</p>
-                    <p class="testimonial-author">- Sarah K.</p>
+            
+            <div class="pet-form">
+                <div class="form-group">
+                    <label for="pet-name">Name Your Pet</label>
+                    <input type="text" id="pet-name" class="form-control" placeholder="Enter a name">
                 </div>
-                <div class="testimonial-nav">
-                    <button class="active"></button>
-                    <button></button>
-                    <button></button>
+                
+                <h4>Choose a Color</h4>
+                <div class="color-options">
+                    <div class="color-option active" style="background-color: #FF7D9C;" onclick="customizePet('color', '#FF7D9C')"></div>
+                    <div class="color-option" style="background-color: #85D2FF;" onclick="customizePet('color', '#85D2FF')"></div>
+                    <div class="color-option" style="background-color: #A0E57C;" onclick="customizePet('color', '#A0E57C')"></div>
+                    <div class="color-option" style="background-color: #FFD166;" onclick="customizePet('color', '#FFD166')"></div>
+                    <div class="color-option" style="background-color: #C792EA;" onclick="customizePet('color', '#C792EA')"></div>
+                </div>
+                
+                <h4>Add Accessories</h4>
+                <div class="accessory-options">
+                    <div class="accessory-option" onclick="customizePet('accessory', 'hat')">
+                        <i class="fas fa-hat-wizard fa-2x"></i>
+                    </div>
+                    <div class="accessory-option" onclick="customizePet('accessory', 'glasses')">
+                        <i class="fas fa-glasses fa-2x"></i>
+                    </div>
+                    <div class="accessory-option" onclick="customizePet('accessory', 'bow')">
+                        <i class="fas fa-ribbon fa-2x"></i>
+                    </div>
+                    <div class="accessory-option" onclick="customizePet('accessory', 'bowtie')">
+                        <i class="fas fa-user-tie fa-2x"></i>
+                    </div>
+                </div>
+                
+                <div class="preview-container">
+                    <div class="preview-pet float-animation" id="preview-pet">
+                        <img src="/api/placeholder/200/200" alt="Preview">
+                    </div>
+                </div>
+                
+                <button class="cta-button" style="width: 100%;" onclick="completePetCreation()">Adopt Your Pet</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard-section" class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h2>Your Pet Dashboard</h2>
+                <p>Day 1 with <span id="pet-name-display">Your Pet</span></p>
+            </div>
+            
+            <div class="pet-status">
+                <div class="status-item">
+                    <div class="status-icon"><i class="fas fa-heart"></i></div>
+                    <div class="status-value">85%</div>
+                    <div class="status-label">Happiness</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon"><i class="fas fa-hamburger"></i></div>
+                    <div class="status-value">72%</div>
+                    <div class="status-label">Hunger</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon"><i class="fas fa-bath"></i></div>
+                    <div class="status-value">90%</div>
+                    <div class="status-label">Cleanliness</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon"><i class="fas fa-brain"></i></div>
+                    <div class="status-value">25%</div>
+                    <div class="status-label">Intelligence</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-tabs">
+                <button class="tab-button active" onclick="openTab('care-tab')">Care</button>
+                <button class="tab-button" onclick="openTab('fun-tab')">Fun Zone</button>
+                <button class="tab-button" onclick="openTab('intellectual-tab')">Intellectual Zone</button>
+                <button class="tab-button" onclick="openTab('progress-tab')">Progress</button>
+            </div>
+            
+            <!-- Care Tab -->
+            <div id="care-tab" class="tab-content active">
+                <h3>Take Care of Your Pet</h3>
+                <p>Your pet needs regular care to stay healthy and happy!</p>
+                
+                <div class="care-actions">
+                    <div class="care-card" onclick="careAction('feed')">
+                        <div class="care-icon"><i class="fas fa-utensils"></i></div>
+                        <h4 class="care-title">Feed</h4>
+                        <p class="care-description">Keep your pet well-fed and energetic</p>
+                    </div>
+                    
+                    <div class="care-card" onclick="careAction('clean')">
+                        <div class="care-icon"><i class="fas fa-shower"></i></div>
+                        <h4 class="care-title">Clean</h4>
+                        <p class="care-description">A clean pet is a happy pet</p>
+                    </div>
+                    
+                    <div class="care-card" onclick="careAction('sleep')">
+                        <div class="care-icon"><i class="fas fa-moon"></i></div>
+                        <h4 class="care-title">Sleep</h4>
+                        <p class="care-description">Rest is essential for growth</p>
+                    </div>
+                    
+                    <div class="care-card" onclick="careAction('health')">
+                        <div class="care-icon"><i class="fas fa-heartbeat"></i></div>
+                        <h4 class="care-title">Health Check</h4>
+                        <p class="care-description">Monitor your pet's wellbeing</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fun Zone Tab -->
+            <div id="fun-tab" class="tab-content">
+                <div class="fun-zone">
+                    <h3>Games & Activities</h3>
+                    <p>Have fun with your pet and strengthen your bond!</p>
+                    
+                    <div class="games-grid">
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-puzzle-piece fa-3x"></i>
+                            </div>
+                            <div class="game-details">
+                                <h4 class="game-title">Puzzle Time</h4>
+                                <p class="game-description">Solve puzzles together</p>
+                                <button class="play-button" onclick="playGame('puzzle')">Play</button>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-running fa-3x"></i>
+                            </div>
+                            <div class="game-details">
+                                <h4 class="game-title">Race</h4>
+                                <p class="game-description">Race against time</p>
+                                <button class="play-button" onclick="playGame('race')">Play</button>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-basketball-ball fa-3x"></i>
+                            </div>
+                            <div class="game-details">
+                                <h4 class="game-title">Catch</h4>
+                                <p class="game-description">A classic game of catch</p>
+                                <button class="play-button" onclick="playGame('catch')">Play</button>
+                            </div>
+                        </div>
+                        
+                        <div class="game-card">
+                            <div class="game-image">
+                                <i class="fas fa-memory fa-3x"></i>
+                            </div>
+                            <div class="game-details">
+                                <h4 class="game-title">Memory</h4>
+                                <p class="game-description">Test your memory skills</p>
+                                <button class="play-button" onclick="playGame('memory')">Play</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Intellectual Zone Tab -->
+            <div id="intellectual-tab" class="tab-content">
+                <div class="intellectual-zone">
+                    <h3>Conversations & Learning</h3>
+                    <p>Engage in meaningful discussions with your pet to help it grow intellectually!</p>
+                    
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message pet-message">
+                                Hi there! I'm excited to learn and grow with you. What would you like to talk about today?
+                                <div class="message-time">Just now</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <input type="text" id="chat-input" placeholder="Type your message...">
+                            <button class="send-button" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Tab -->
+            <div id="progress-tab" class="tab-content">
+                <h3>Growth & Development</h3>
+                <p>Watch your pet evolve and grow through your interactions!</p>
+                
+                <div class="progress-section">
+                    <h4>Intelligence Level</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%;"></div>
+                    </div>
+                    <p>Your pet is developing its intelligence through your conversations.</p>
+                </div>
+                
+                <div class="progress-section">
+                    <h4>Social Skills</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%;"></div>
+                    </div>
+                    <p>Regular interactions help improve your pet's social abilities.</p>
+                </div>
+                
+                <div class="progress-section">
+                    <h4>Emotional Bond</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 35%;"></div>
+                    </div>
+                    <p>The emotional connection between you and your pet grows stronger each day.</p>
+                </div>
+                
+                <div class="progress-section">
+                    <h4>Overall Development</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%;"></div>
+                    </div>
+                    <p>Your pet is on a good path of growth and development.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="cta">
-        <div class="container">
-            <div class="cta-content">
-                <h2>Ready to Meet Your New Best Friend?</h2>
-                <p>Join thousands of happy pet owners and experience the joy of having an AI companion that grows with you.</p>
-                <button class="cta-button">Adopt Your Petzy Now</button>
+    <!-- Action Modal -->
+    <div class="modal" id="action-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 class="modal-title" id="modal-title">Action Title</h3>
+            <div id="modal-content">
+                <!-- Modal content will be dynamically inserted here -->
             </div>
+            <button class="cta-button" style="width: 100%; margin-top: 20px;" onclick="completeAction()">Complete</button>
         </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-about">
-                    <div class="footer-logo">
-                        <i class="fas fa-paw"></i> Petzy
-                    </div>
-                    <p>Bringing the joy of pet companionship to everyone through advanced AI technology.</p>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        <li><a href="#testimonials">Testimonials</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">FAQs</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2025 Petzy. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    </div>
 
     <script>
-        // Mobile Navigation Toggle
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const icon = themeToggle.querySelector('i');
+            
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+        
+        // Mobile navigation toggle
         const mobileToggle = document.getElementById('mobileToggle');
         const navLinks = document.getElementById('navLinks');
         
         mobileToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            mobileToggle.innerHTML = navLinks.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
         });
         
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
+        // Section navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.getElementById('landing-section').style.display = 'none';
+            document.getElementById('story-section').style.display = 'none';
+            document.getElementById('pet-selection').style.display = 'none';
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('customization-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'none';
+            
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // Close mobile menu if open
+            navLinks.classList.remove('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Tab navigation for dashboard
+        function openTab(tabId) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            // Show the selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to the clicked button
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Pet selection
+        let selectedPet = '';
+        
+        function choosePet(petName) {
+            selectedPet = petName;
+            console.log(`Selected pet: ${selectedPet}`);
+            // You could store this in localStorage for persistence
+            localStorage.setItem('selectedPet', petName);
+        }
+        
+        // Pet customization
+        let petColor = '#FF7D9C';
+        let petAccessories = [];
+        
+        function customizePet(type, value) {
+            if (type === 'color') {
+                petColor = value;
                 
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    window.scrollTo({
-                        top: target.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    if (navLinks.classList.contains('active')) {
-                        navLinks.classList.remove('active');
-                        mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                // Update active color
+                const colorOptions = document.querySelectorAll('.color-option');
+                colorOptions.forEach(option => {
+                    option.classList.remove('active');
+                    if (option.style.backgroundColor === value) {
+                        option.classList.add('active');
                     }
-                }
-            });
-        });
-        
-        // Simple testimonial carousel
-        const testimonials = document.querySelectorAll('.testimonial');
-        const navButtons = document.querySelectorAll('.testimonial-nav button');
-        
-        navButtons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                // Hide all testimonials and deactivate all buttons
-                testimonials.forEach(t => t.classList.remove('active'));
-                navButtons.forEach(b => b.classList.remove('active'));
+                });
+            } else if (type === 'accessory') {
+                const accessoryIndex = petAccessories.indexOf(value);
                 
-                // Show selected testimonial and activate button
-                testimonials[index].classList.add('active');
-                button.classList.add('active');
-            });
+                if (accessoryIndex === -1) {
+                    // Add accessory
+                    petAccessories.push(value);
+                    
+                    // Update active accessory
+                    const accessoryOptions = document.querySelectorAll('.accessory-option');
+                    accessoryOptions.forEach(option => {
+                        if (option.onclick.toString().includes(value)) {
+                            option.classList.add('active');
+                        }
+                    });
+                } else {
+                    // Remove accessory
+                    petAccessories.splice(accessoryIndex, 1);
+                    
+                    // Update active accessory
+                    const accessoryOptions = document.querySelectorAll('.accessory-option');
+                    accessoryOptions.forEach(option => {
+                        if (option.onclick.toString().includes(value)) {
+                            option.classList.remove('active');
+                        }
+                    });
+                }
+            }
+            
+            // Update preview
+            console.log(`Pet color: ${petColor}, accessories: ${petAccessories.join(', ')}`);
+            // In a real implementation, you would update the preview image
+        }
+        
+        function completePetCreation() {
+            const petName = document.getElementById('pet-name').value || selectedPet;
+            
+            // Save customization options
+            localStorage.setItem('petName', petName);
+            localStorage.setItem('petColor', petColor);
+            localStorage.setItem('petAccessories', JSON.stringify(petAccessories));
+            
+            // Update pet name display
+            document.getElementById('pet-name-display').textContent = petName;
+            
+            // Navigate to dashboard
+            showSection('dashboard-section');
+        }
+        
+        // Care actions
+        function careAction(action) {
+            const modal = document.getElementById('action-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            // Set modal content based on action
+            switch(action) {
+                case 'feed':
+                    modalTitle.textContent = 'Feed Your Pet';
+                    modalContent.innerHTML = `
+                        <p>Choose a meal for your pet:</p>
+                        <div class="care-actions" style="grid-template-columns: repeat(2, 1fr); margin-top: 15px;">
+                            <div class="care-card">
+                                <div class="care-icon"><i class="fas fa-apple-alt"></i></div>
+                                <h4 class="care-title">Healthy Meal</h4>
+                            </div>
+                            <div class="care-card">
+                                <div class="care-icon"><i class="fas fa-cookie"></i></div>
+                                <h4 class="care-title">Treat</h4>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'clean':
+                    modalTitle.textContent = 'Clean Your Pet';
+                    modalContent.innerHTML = `
+                        <p>Choose a cleaning activity:</p>
+                        <div class="care-actions" style="grid-template-columns: repeat(2, 1fr); margin-top: 15px;">
+                            <div class="care-card">
+                                <div class="care-icon"><i class="fas fa-bath"></i></div>
+                                <h4 class="care-title">Bath Time</h4>
+                            </div>
+                            <div class="care-card">
+                                <div class="care-icon"><i class="fas fa-broom"></i></div>
+                                <h4 class="care-title">Quick Clean</h4>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'sleep':
+                    modalTitle.textContent = 'Rest Time';
+                    modalContent.innerHTML = `
+                        <p>Choose a rest duration:</p>
+                        <div class="care-actions" style="grid-template-columns: repeat(2, 1fr); margin-top: 15px;">
+                            <div class="care-card">
+                                <div class="care-icon"><i class="fas fa-hourglass-half"></i></div>
+                                <h4 class="care-title">Short Nap</h4>
+                            </div>
+                            <div class="care-card">
+                                <div class="care-icon"><i class="fas fa-bed"></i></div>
+                                <h4 class="care-title">Full Sleep</h4>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'health':
+                    modalTitle.textContent = 'Health Check';
+                    modalContent.innerHTML = `
+                        <p>Your pet is in good health! Here are the details:</p>
+                        <ul style="margin-top: 15px; margin-left: 20px;">
+                            <li>Energy Level: Excellent</li>
+                            <li>Mood: Happy</li>
+                            <li>Nutrition: Good</li>
+                            <li>Growth: On track</li>
+                        </ul>
+                    `;
+                    break;
+            }
+            
+            // Show modal
+            modal.style.display = 'flex';
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('action-modal');
+            modal.style.display = 'none';
+        }
+        
+        function completeAction() {
+            // Update pet status (in a real app, you would have more logic here)
+            const hungerStatus = document.querySelector('.status-item:nth-child(2) .status-value');
+            const cleanStatus = document.querySelector('.status-item:nth-child(3) .status-value');
+            
+            // Simulate status improvements
+            const hungerValue = parseInt(hungerStatus.textContent);
+            const cleanValue = parseInt(cleanStatus.textContent);
+            
+            hungerStatus.textContent = `${Math.min(100, hungerValue + 10)}%`;
+            cleanStatus.textContent = `${Math.min(100, cleanValue + 5)}%`;
+            
+            // Close modal
+            closeModal();
+        }
+        
+        // Games
+        function playGame(gameType) {
+            const modal = document.getElementById('action-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            
+            // Set modal content based on game type
+            switch(gameType) {
+                case 'puzzle':
+                    modalTitle.textContent = 'Puzzle Time';
+                    modalContent.innerHTML = `
+                        <p>Help your pet solve this puzzle!</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="/api/placeholder/320/200" alt="Puzzle Game">
+                        </div>
+                    `;
+                    break;
+                case 'race':
+                    modalTitle.textContent = 'Race Game';
+                    modalContent.innerHTML = `
+                        <p>Race against the clock with your pet!</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="/api/placeholder/320/200" alt="Race Game">
+                        </div>
+                    `;
+                    break;
+                case 'catch':
+                    modalTitle.textContent = 'Catch Game';
+                    modalContent.innerHTML = `
+                        <p>Play catch with your pet!</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="/api/placeholder/320/200" alt="Catch Game">
+                        </div>
+                    `;
+                    break;
+                case 'memory':
+                    modalTitle.textContent = 'Memory Game';
+                    modalContent.innerHTML = `
+                        <p>Test your memory skills together!</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="/api/placeholder/320/200" alt="Memory Game">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            // Show modal
+            modal.style.display = 'flex';
+        }
+        
+        // Chat functionality
+        function sendMessage() {
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            if (chatInput.value.trim() === '') return;
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.innerHTML = `
+                ${chatInput.value}
+                <div class="message-time">Just now</div>
+            `;
+            chatMessages.appendChild(userMessage);
+            
+            // Clear input
+            const userQuestion = chatInput.value;
+            chatInput.value = '';
+            
+            // Simulate pet response (with delay)
+            setTimeout(() => {
+                const petMessage = document.createElement('div');
+                petMessage.className = 'message pet-message';
+                
+                // Simple AI responses based on keywords
+                let response = '';
+                const petName = document.getElementById('pet-name-display').textContent;
+                
+                if (userQuestion.toLowerCase().includes('hello') || userQuestion.toLowerCase().includes('hi')) {
+                    response = `Hello! It's great to chat with you today!`;
+                } else if (userQuestion.toLowerCase().includes('how are you')) {
+                    response = `I'm doing great, thanks for asking! How about you?`;
+                } else if (userQuestion.toLowerCase().includes('name')) {
+                    response = `My name is ${petName}! You chose it for me, remember?`;
+                } else if (userQuestion.toLowerCase().includes('learn') || userQuestion.toLowerCase().includes('teach')) {
+                    response = `I love learning new things! The more we talk, the smarter I'll become. What would you like to teach me today?`;
+                } else if (userQuestion.toLowerCase().includes('game') || userQuestion.toLowerCase().includes('play')) {
+                    response = `I'd love to play a game! Check out the Fun Zone tab to see what games are available.`;
+                } else if (userQuestion.toLowerCase().includes('food') || userQuestion.toLowerCase().includes('hungry')) {
+                    response = `I could use a snack! You can feed me through the Care tab.`;
+                } else {
+                    response = `That's an interesting thought! I'm still learning, but I'd love to hear more about that.`;
+                }
+                
+                petMessage.innerHTML = `
+                    ${response}
+                    <div class="message-time">Just now</div>
+                `;
+                chatMessages.appendChild(petMessage);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Update intelligence in a real app
+                const intelligenceStatus = document.querySelector('.status-item:nth-child(4) .status-value');
+                const intelligenceValue = parseInt(intelligenceStatus.textContent);
+                intelligenceStatus.textContent = `${Math.min(100, intelligenceValue + 1)}%`;
+                
+                // Update intelligence progress bar
+                const intelligenceProgress = document.querySelector('#progress-tab .progress-fill');
+                intelligenceProgress.style.width = `${Math.min(100, parseInt(intelligenceProgress.style.width) + 1)}%`;
+            }, 1000);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Allow sending messages with Enter key
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
+        
+        // Initialize pet name from localStorage if available
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedPetName = localStorage.getItem('petName');
+            if (storedPetName) {
+                document.getElementById('pet-name-display').textContent = storedPetName;
+            }
+        });
+        
+        // Close modal when clicking outside it
+        window.onclick = function(event) {
+            const modal = document.getElementById('action-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
     </script>
 </body>
 </html>
